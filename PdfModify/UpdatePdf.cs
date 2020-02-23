@@ -1,21 +1,32 @@
 ﻿using iTextSharp.text;
 using iTextSharp.text.pdf;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Net;
 
 namespace PdfModify
 {
     class UpdatePdf
     {
-        public void ManipulatePdf(String src, String dest)
+        public void ManipulatePdf(String src, String dest,IDictionary<string,string> pdfParams)
         {
             PdfReader reader = new PdfReader(src);
             Rectangle pagesize = reader.GetPageSize(1);
             PdfStamper stamper = new PdfStamper(reader, new FileStream(dest, FileMode.Create));
             AcroFields form = stamper.AcroFields;
-            form.SetField("Name", "Jennifer");
-            form.SetField("Company", "iText's next customer");
-            form.SetField("Country", "No Man's Land");
+            byte[] fontBinary;
+            using (var client = new WebClient())
+                fontBinary = client.DownloadData("http://beta.adahi.linkdev.com/Style%20Library/Adahi/fonts/Tahoma.ttf");
+            var arialBaseFont = BaseFont.CreateFont("Tahoma.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED, false, fontBinary, null);
+            form.GenerateAppearances = true;
+            form.AddSubstitutionFont(arialBaseFont);
+
+            foreach (var param in pdfParams)
+            {
+                form.SetField(param.Key, param.Value);
+            }
+            
             PdfPTable table = new PdfPTable(2);
             table.AddCell("#");
             table.AddCell("description");

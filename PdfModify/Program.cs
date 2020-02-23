@@ -14,8 +14,9 @@ namespace PdfModify
             PdfReader pdfReader = new PdfReader(pdfTemplate);
             PdfStamper pdfStamper = new PdfStamper(pdfReader, new FileStream(newFile, FileMode.Create));
             AcroFields pdfFormFields = pdfStamper.AcroFields;
-
-            var fontBinary = new WebClient().DownloadData("http://beta.adahi.linkdev.com/Style%20Library/Adahi/fonts/Tahoma.ttf");
+            byte[] fontBinary;
+            using (var client = new WebClient())
+            fontBinary = client.DownloadData("http://beta.adahi.linkdev.com/Style%20Library/Adahi/fonts/Tahoma.ttf");
 
             var arialBaseFont = BaseFont.CreateFont("Tahoma.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED, false, fontBinary, null);
 
@@ -32,7 +33,7 @@ namespace PdfModify
 
             // report by reading values from completed PDF  
             //string sTmp = "W-4 Completed for " + pdfFormFields.GetField("f1_09(0)") + " " + pdfFormFields.GetField("f1_10(0)");
-            
+
             // flatten the form to remove editting options, set it to false  
             // to leave the form open to subsequent manual edits  
             pdfStamper.FormFlattening = false;
