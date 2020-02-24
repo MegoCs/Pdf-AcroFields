@@ -32,13 +32,14 @@ namespace PdfModify
                 pdfFormFields.SetField(de.Key, $"{de.Key}");
             }
 
-            PdfPTable table = new PdfPTable(6)
-            {
-                RunDirection = PdfWriter.RUN_DIRECTION_RTL,
-            };
-            bool internalShipment = true;
+            PdfPTable table;
+            bool internalShipment = false;
             if (internalShipment)
             {
+                table = new PdfPTable(6)
+                {
+                    RunDirection = PdfWriter.RUN_DIRECTION_RTL,
+                };
                 table.AddCell(new PdfPCell(new Phrase("جهة الارسالية", font)) { HorizontalAlignment = Element.ALIGN_CENTER, VerticalAlignment = Element.ALIGN_CENTER });
                 table.AddCell(new Phrase("", font));
                 table.AddCell(new PdfPCell(new Phrase("المحافظة", font)) { HorizontalAlignment = Element.ALIGN_CENTER, VerticalAlignment = Element.ALIGN_CENTER });
@@ -51,17 +52,33 @@ namespace PdfModify
                 table.AddCell(new PdfPCell(new Phrase("", font)) { Colspan = 2, HorizontalAlignment = Element.ALIGN_CENTER, VerticalAlignment = Element.ALIGN_CENTER });
                 table.SetTotalWidth(new float[] { 115, 115, 115, 60, 130, 100 });
             }
-            else { 
-            
-            
+            else {
+                table = new PdfPTable(4)
+                {
+                    RunDirection = PdfWriter.RUN_DIRECTION_RTL,
+                };
+                table.AddCell(new PdfPCell(new Phrase("Mission Country", font)) { HorizontalAlignment = Element.ALIGN_CENTER, VerticalAlignment = Element.ALIGN_CENTER });
+                table.AddCell(new Phrase("", font));
+                table.AddCell(new PdfPCell(new Phrase("Mission Entity", font)) { HorizontalAlignment = Element.ALIGN_CENTER, VerticalAlignment = Element.ALIGN_CENTER });
+                table.AddCell(new Phrase("", font));
+                table.AddCell(new PdfPCell(new Phrase("Port of Entry / City", font)) { HorizontalAlignment = Element.ALIGN_CENTER, VerticalAlignment = Element.ALIGN_CENTER });
+                table.AddCell(new Phrase("", font));
+                table.AddCell(new PdfPCell(new Phrase("Entity Contact Person", font)) { HorizontalAlignment = Element.ALIGN_CENTER, VerticalAlignment = Element.ALIGN_CENTER });
+
+                var p = new Paragraph("احمد مجدي,01090510845\n", font)
+                {
+                    "احمد مجدي,01090510845\n",
+                    "احمد مجدي,01090510845\n"
+                };
+                p.Alignment = Element.ALIGN_CENTER;
+                table.AddCell(new PdfPCell(p));
+                table.SetTotalWidth(new float[] {175,140,190,130});
             }
 
             ColumnText column = new ColumnText(pdfStamper.GetOverContent(1));
-
-            Rectangle rectPage1 = new Rectangle(-30, 600, table.TotalWidth, table.CalculateHeights());
+            var internalShipmentTableHeight = internalShipment ? 1 : 0;
+            Rectangle rectPage1 = new Rectangle(-30, 600- (25* internalShipmentTableHeight), table.TotalWidth, table.CalculateHeights());
             column.SetSimpleColumn(rectPage1);
-            column.AddElement(table);
-            column.AddElement(new Chunk("\n"));
             column.AddElement(table);
             column.AddElement(new Chunk("\n"));
             column.AddElement(table);
